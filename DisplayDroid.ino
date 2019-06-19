@@ -205,6 +205,11 @@ U8X8_SSD1306_128X64_NONAME_4W_SW_SPI u8x8(/* clock=*/ 4, /* data=*/ 5, /* cs=*/ 
 uint8_t u8log_buffer[U8LOG_WIDTH*U8LOG_HEIGHT];
 U8X8LOG u8x8log;
 
+unsigned long t = 0;
+char c = 0;
+
+char buf[512] = {};
+int p = 0;
 
 
 void setup(void)
@@ -227,11 +232,13 @@ void setup(void)
   Serial.begin(115200);
 
   u8x8log.print("Welcome to DisplayBoard!!!\n");
-  delay(100);
+//  delay(100);
 }
 
-unsigned long t = 0;
-char c = 0;
+
+int delay_time = 0;
+#define MAX_DELAY 20
+
 
 // print the output of millis() to the terminal every second
 void loop(void) {
@@ -245,14 +252,32 @@ void loop(void) {
   u8x8log.print("\n");
   delay(500);
   */
-  while (!Serial.available());
+  while (!Serial.available()) {
+    delay_time++;
+    if (delay_time > MAX_DELAY) {
+      u8x8log.print(buf);
+      p = 0;
+      buf[p] = 0;
+    }
+    delay(10);
+  }
   while (Serial.available()) {
+    if (p >= 512) {
+      p = 0;
+      buf[p] = 0;
+    }
     c = (char)Serial.read();
-    Serial.print((int)c);
+//    Serial.print((int)c);
     if (c == '\r' || (int)c == 10) {
-      u8x8log.print('\n');
+//      u8x8log.print('\n');
+      buf[p] = '\n';
+      p++;
+      buf[p] = 0;
       continue;
     }
-    u8x8log.print(c);
+//    u8x8log.print(c);
+    buf[p] = c;
+    p++;
+    buf[p] = 0;
   }
 }
