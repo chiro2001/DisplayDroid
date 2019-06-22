@@ -237,7 +237,7 @@ void setup(void)
 
 
 int delay_time = 0;
-#define MAX_DELAY 20
+#define MAX_DELAY 500
 
 
 // print the output of millis() to the terminal every second
@@ -252,14 +252,14 @@ void loop(void) {
   u8x8log.print("\n");
   delay(500);
   */
-  while (!Serial.available()) {
+  if (!Serial.available()) {
     delay_time++;
     if (delay_time > MAX_DELAY) {
       u8x8log.print(buf);
       p = 0;
       buf[p] = 0;
     }
-    delay(10);
+    //delay(1);
   }
   while (Serial.available()) {
     if (p >= 512) {
